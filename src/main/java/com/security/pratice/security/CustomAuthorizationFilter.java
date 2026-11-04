@@ -36,9 +36,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 		
 			LoginRequestDao body = objectMapper.readValue(request.getInputStream(), LoginRequestDao.class);	
 
-			if(body != null && !request.getRequestURI().equals("/login")) {
-				log.info("username: {}", body.username());
-					
+			if(body != null) {
 				UserDetails userDetails = customUserDetailsService.loadUserByUsername(body.username());
 					
 				UsernamePasswordAuthenticationToken token = 
