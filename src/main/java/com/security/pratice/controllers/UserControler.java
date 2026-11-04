@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +30,8 @@ public class UserControler {
 		if(!auth.isAuthenticated()) {
 			return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("Unauthenticaded");
 		}
+		
+		SecurityContextHolder.getContext().setAuthentication(auth);
 		
 		return ResponseEntity.ok("Authenticated");
 	}
