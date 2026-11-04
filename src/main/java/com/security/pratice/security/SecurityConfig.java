@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+
 import com.security.pratice.repository.UserRepository;
 
 @Configuration
@@ -20,9 +22,11 @@ import com.security.pratice.repository.UserRepository;
 public class SecurityConfig {
 	
 	private UserRepository userRepository;
+	private CustomAuthorizationFilter customAuthorizationFilter;
 	
-	public SecurityConfig(UserRepository userRepository) {
+	public SecurityConfig(UserRepository userRepository, CustomAuthorizationFilter customAuthorizationFilter) {
 		this.userRepository = userRepository;
+		this.customAuthorizationFilter = customAuthorizationFilter;
 	}
 	
 	@Bean
@@ -34,7 +38,8 @@ public class SecurityConfig {
 			.authorizeHttpRequests(request -> request 	
 					.requestMatchers("/login").permitAll()
 					.requestMatchers("/protected").hasAuthority("USER")
-					.anyRequest().authenticated());
+					.anyRequest().authenticated())
+			.addFilterBefore(customAuthorizationFilter, AnonymousAuthenticationFilter.class);
 		
 		return http.build();
 	}
