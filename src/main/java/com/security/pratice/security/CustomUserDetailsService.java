@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.security.pratice.dao.UserDAO;
 import com.security.pratice.models.Role;
 import com.security.pratice.models.User;
 import com.security.pratice.repository.UserRepository;
@@ -22,7 +23,6 @@ import jakarta.transaction.Transactional;
 public class CustomUserDetailsService implements UserDetailsService {
 	
 	private UserRepository userRepository;
-	private static final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
 	
 	public CustomUserDetailsService(UserRepository userRepository) {
 		this.userRepository = userRepository;
@@ -30,17 +30,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 	
 	@Override
 	@Transactional
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
-		User user = userRepository.findUserByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {	
+		User user = userRepository.findUserRoleByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 		
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>(Collections.emptyList());
 		
 		user.getRoles().stream().map(Role::getRole)
-			.toList().forEach((e) -> authorities.add(new SimpleGrantedAuthority(e)));
-		
-		user.getRoles().stream().map(Role::getRole)
-		.toList().forEach((e) -> log.info("Role: {}", e));
+		.toList().forEach((e) -> authorities.add(new SimpleGrantedAuthority(e)));
 		
 		return org.springframework.security.core.userdetails.User.builder()
 				.username(user.getUsername())
