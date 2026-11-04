@@ -26,6 +26,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
+import com.security.pratice.dao.UserDAO;
 import com.security.pratice.repository.UserRepository;
 
 import jakarta.servlet.ServletException;
@@ -37,11 +38,9 @@ import tools.jackson.databind.ObjectMapper;
 @EnableWebSecurity
 public class SecurityConfig {
 	
-	private ObjectMapper objectMapper;
 	private UserRepository userRepository;
 	
-	public SecurityConfig(ObjectMapper objectMapper, UserRepository userRepository) {
-		this.objectMapper = objectMapper;
+	public SecurityConfig(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 	
