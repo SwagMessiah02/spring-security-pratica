@@ -1,6 +1,6 @@
 package com.security.pratice.security;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.Collections;
 import java.util.List;
 
@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.security.pratice.dao.UserDAO;
 import com.security.pratice.models.Role;
 import com.security.pratice.models.User;
 import com.security.pratice.repository.UserRepository;

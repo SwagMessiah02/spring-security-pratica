@@ -1,6 +1,6 @@
 package com.security.pratice.security;
 
-import java.awt.PageAttributes.MediaType;
+import java.awt.PageAttributes.MediaType; 
 import java.io.IOException;
 import java.util.Map;
 
@@ -26,7 +26,6 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import com.security.pratice.dao.UserDAO;
 import com.security.pratice.repository.UserRepository;
 
 import jakarta.servlet.ServletException;
