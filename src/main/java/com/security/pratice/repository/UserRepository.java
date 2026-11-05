@@ -10,6 +10,7 @@ import com.security.pratice.models.User;
 public interface UserRepository extends JpaRepository<User, Long>{
 	Optional<User> findUserByUsername(String username);
 	
+	// Find User by username and populate the roles association with Role instances eagerly
 	@Query("select u from User u left join fetch u.roles where u.username = :username")
 	Optional<User> findUserRoleByUsername(String username);
 }
