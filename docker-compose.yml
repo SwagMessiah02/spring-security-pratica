@@ -28,19 +28,23 @@ services:
       retries: 20
       start_period: 10s
   app1:
+    container_name: app1
     <<: *app
     ports:
       - "8080:8080"
   app2:
+    container_name: app2
     <<: *app
     ports:
       - "8081:8080"
   app3:
+    container_name: app3
     <<: *app
     ports:
       - "8082:8080"
   nginx:
     image: nginx
+    container_name: nginx-proxy
     depends_on:
       - app1
       - app2
