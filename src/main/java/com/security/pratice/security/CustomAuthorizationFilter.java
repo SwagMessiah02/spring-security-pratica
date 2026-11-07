@@ -44,6 +44,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 	
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getRequestURI().equals("/login");
+        return request.getRequestURI().equals("/pratice-0.0.1-SNAPSHOT/login");
     }
 }
