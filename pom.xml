@@ -11,6 +11,7 @@
 	<groupId>com.security</groupId>
 	<artifactId>pratice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name/>
 	<description/>
 	<url/>
