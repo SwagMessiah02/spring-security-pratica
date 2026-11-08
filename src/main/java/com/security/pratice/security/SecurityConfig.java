@@ -1,6 +1,6 @@
 package com.security.pratice.security;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Bean; 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.security.pratice.repository.UserRepository;
 
@@ -22,25 +22,26 @@ import com.security.pratice.repository.UserRepository;
 public class SecurityConfig {
 	
 	private UserRepository userRepository;
-	private CustomAuthorizationFilter customAuthorizationFilter;
+	private JwtAutenticationFilter autenticationFilter;
 	
-	public SecurityConfig(UserRepository userRepository, CustomAuthorizationFilter customAuthorizationFilter) {
+	public SecurityConfig(UserRepository userRepository, 
+			JwtAutenticationFilter autenticationFilter) {
 		this.userRepository = userRepository;
-		this.customAuthorizationFilter = customAuthorizationFilter;
+		this.autenticationFilter = autenticationFilter;
 	}
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-		http 
-			.csrf(c -> c.disable())
-			.sessionManagement(session ->
-            	session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(request -> request 	
-					.requestMatchers("/login").permitAll()
-					.requestMatchers("/protected").hasAuthority("USER")
-					.anyRequest().authenticated())
-			.addFilterBefore(customAuthorizationFilter, AnonymousAuthenticationFilter.class);
-		
+		http
+	    .csrf(c -> c.disable())
+	    .sessionManagement(session ->
+	        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	    .authorizeHttpRequests(request -> request
+	        .requestMatchers("/login", "/register", "/error").permitAll()
+	        .requestMatchers("/protected").hasAuthority("USER")
+	        .anyRequest().authenticated())
+	    .addFilterBefore(autenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
 	}
 
