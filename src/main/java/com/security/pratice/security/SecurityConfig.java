@@ -22,12 +22,9 @@ import com.security.pratice.repository.UserRepository;
 public class SecurityConfig {
 	
 	private UserRepository userRepository;
-	private JwtAutenticationFilter autenticationFilter;
 	
-	public SecurityConfig(UserRepository userRepository, 
-			JwtAutenticationFilter autenticationFilter) {
+	public SecurityConfig(UserRepository userRepository) {
 		this.userRepository = userRepository;
-		this.autenticationFilter = autenticationFilter;
 	}
 	
 	@Bean
@@ -39,8 +36,7 @@ public class SecurityConfig {
 	    .authorizeHttpRequests(request -> request
 	        .requestMatchers("/login", "/register", "/validate").permitAll()
 	        .requestMatchers("/protected").hasAuthority("USER")
-	        .anyRequest().authenticated())
-	    .addFilterBefore(autenticationFilter, UsernamePasswordAuthenticationFilter.class);
+	        .anyRequest().authenticated());
 
 		return http.build();
 	}
