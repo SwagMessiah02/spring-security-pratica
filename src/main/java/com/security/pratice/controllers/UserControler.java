@@ -2,11 +2,13 @@ package com.security.pratice.controllers;
 
 import java.util.Set;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode; 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.token.TokenService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
@@ -20,6 +22,7 @@ import com.security.pratice.models.User;
 import com.security.pratice.repository.UserRepository;
 import com.security.pratice.security.JwtTokenService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
@@ -29,15 +32,18 @@ public class UserControler {
 	private JwtTokenService jwtTokenService;
 	private UserRepository repository;
 	private PasswordEncoder passwordEncoder;
+	private JwtTokenService tokenService;
 	
 	public UserControler(AuthenticationManager authenticationManager, 
 			JwtTokenService jwtTokenService,
 			UserRepository repository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder,
+			JwtTokenService tokenService) {
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenService = jwtTokenService;
 		this.repository = repository;
 		this.passwordEncoder = passwordEncoder;
+		this.tokenService = tokenService;
 	}
 	
 	@PostMapping("/login")
@@ -75,8 +81,24 @@ public class UserControler {
 		return ResponseEntity.ok(new RegisterResponseDTO(200, "User created"));
 	}
 	
-	@PostMapping("/protected")
-	public ResponseEntity<String> protected_route() {
-		return ResponseEntity.ok("Autorizado");
+	@GetMapping("/validate")
+	public ResponseEntity<ValidateResponseDTO> validate(HttpServletRequest request, HttpServletResponse response) {
+		
+		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+	    if (header == null || !header.startsWith("Bearer ")) {
+	        return ResponseEntity.status(400).body(new ValidateResponseDTO("", "Request without Authorization header or token"));
+	    }
+
+	    String token = header.substring(7).trim();
+		
+	    if(tokenService.isTokenValid(token)) {
+	    	String username = tokenService.extractUsername(token);
+	    	response.setHeader("X-Auth-User", username);
+	    	
+	    	return ResponseEntity.status(200).body(new ValidateResponseDTO(username, "Token validated"));
+	    }
+	    
+	    return ResponseEntity.status(400).body(new ValidateResponseDTO("", "Invalid token"));
 	}
 }
