@@ -27,23 +27,23 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
-  app1:
-    container_name: app1
+  auth-api-1:
+    container_name: auth-api-1
     <<: *app
     ports:
       - "8080:8080"
-  app2:
-    container_name: app2
+  auth-api-2:
+    container_name: auth-api-2
     <<: *app
     ports:
       - "8081:8080"
-  app3:
-    container_name: app3
+  auth-api-3:
+    container_name: auth-api-3
     <<: *app
     ports:
       - "8082:8080"
-  app-protected:
-    container_name: app-protected
+  app:
+    container_name: app
     build: C:\Users\Vinicius\Documents\Spring_exercicios\app\app
     environment:
       DB_HOST: db
@@ -58,9 +58,10 @@ services:
     image: nginx
     container_name: nginx-proxy
     depends_on:
-      - app1
-      - app2
-      - app3
+      - auth-api-1
+      - auth-api-2
+      - auth-api-3
+      - app
     ports:
       - "80:80"
     volumes:
