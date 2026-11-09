@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,11 +56,15 @@ public class UserControler {
 	@PostMapping("/register")
 	@Transactional
 	public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO dto) {
+		
+		if(repository.findUserByUsername(dto.username()).isPresent()) {
+			return ResponseEntity.status(400).body(new RegisterResponseDTO(400, "User with same username already exists"));
+		}
+		
 		User user = new User();
 		Role role = new Role();
 	
 		role.setRole("USER");
-		
 		user.setUsername(dto.username());
 		user.setEmail(dto.email());
 		user.setPassword(passwordEncoder.encode(dto.password()));
