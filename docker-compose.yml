@@ -42,6 +42,18 @@ services:
     <<: *app
     ports:
       - "8082:8080"
+  app-protected:
+    container_name: app-protected
+    build: C:\Users\Vinicius\Documents\Spring_exercicios\app\app
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: 12345
+    ports:
+      - "8083:8080"
+    depends_on:
+      db:
+        condition: service_healthy
   nginx:
     image: nginx
     container_name: nginx-proxy
