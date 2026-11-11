@@ -40,7 +40,7 @@ public class UserControler {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDao loginRequest, HttpServletResponse response) {
+	public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest, HttpServletResponse response) {
 		
 		UsernamePasswordAuthenticationToken authentication 
 			= UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(), loginRequest.password());
