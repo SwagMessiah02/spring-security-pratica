@@ -43,7 +43,7 @@ public class UserControler {
 	public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest, HttpServletResponse response) {
 		
 		UsernamePasswordAuthenticationToken authentication 
-			= UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(), loginRequest.password());
+			= UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.email(), loginRequest.password());
 		
 		var auth = this.authenticationManager.authenticate(authentication);
 		
@@ -56,8 +56,8 @@ public class UserControler {
 	@Transactional
 	public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO dto) {
 		
-		if(repository.findUserByUsername(dto.username()).isPresent()) {
-			return ResponseEntity.status(400).body(new RegisterResponseDTO(400, "User with same username already exists"));
+		if(repository.findUserByEmail(dto.email()).isPresent()) {
+			return ResponseEntity.status(400).body(new RegisterResponseDTO(400, "User with same email already exists"));
 		}
 		
 		User user = new User();
