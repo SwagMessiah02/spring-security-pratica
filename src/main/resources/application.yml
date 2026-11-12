@@ -7,6 +7,10 @@ spring:
 
   security:
     oauth2:
+      resourceserver: 
+        jwt:
+          issuer-uri: http://localhost:8084/realms/auth-api
+          jwk-set-uri: http://keycloack:8080/realms/auth-api/protocol/openid-connect/certs
       client:
         registration:
           keycloak:
