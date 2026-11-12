@@ -1,0 +1,29 @@
+server:
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: auth-api
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: auth-api
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            authorization-grant-type: authorization_code   
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid,profile,email
+        provider:
+          keycloak:
+            authorization-uri: ${app.keycloak.browser-url}/realms/auth-api/protocol/openid-connect/auth
+            token-uri: ${app.keycloak.internal-url}/realms/auth-api/protocol/openid-connect/token
+            user-info-uri: ${app.keycloak.internal-url}/realms/auth-api/protocol/openid-connect/userinfo
+            jwk-set-uri: ${app.keycloak.internal-url}/realms/auth-api/protocol/openid-connect/certs
+            user-name-attribute: preferred_username
+
+app:
+  keycloak:
+    browser-url: ${KEYCLOAK_BROWSER_URL:http://localhost:8084}
+    internal-url: ${KEYCLOAK_INTERNAL_URL:http://localhost:8084}
