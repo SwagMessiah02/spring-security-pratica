@@ -1,16 +1,20 @@
 package com.security.pratice.controllers;
 
+import java.time.Instant;
+import java.util.Map;
 import java.util.Set; 
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,15 +52,11 @@ public class UserControler {
 	public ResponseEntity<LoginResponseDTO> 
 		token_reciever(@RegisteredOAuth2AuthorizedClient("keycloak") OAuth2AuthorizedClient client, HttpServletResponse response) {
 		
-		OAuth2AccessToken token = client.getAccessToken();
+		String token = client.getAccessToken().getTokenValue();
 		
-		String jwt = token.getTokenValue().toString();
+		response.setHeader("Authorization", "Bearer " + token);
 		
-		log.info("Token: {}", jwt);
-		
-		response.setHeader("Authorization", "Bearer " + jwt);
-		
-		return ResponseEntity.ok(new LoginResponseDTO(jwt, "Token"));
+		return ResponseEntity.ok(new LoginResponseDTO(token, "Token"));
 	}
 	
 	@PostMapping("/login")
@@ -95,23 +95,15 @@ public class UserControler {
 	}
 	
 	@GetMapping("/validate")
-	public ResponseEntity<ValidateResponseDTO> validate(HttpServletRequest request, HttpServletResponse response) {
-		
-		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        return ResponseEntity.status(400).body(new ValidateResponseDTO("", "Request without Authorization header or token"));
-	    }
-
-	    String token = header.substring(7).trim();
-		
-	    if(tokenService.isTokenValid(token)) {
-	    	String username = tokenService.extractUsername(token);
-	    	response.setHeader("X-Auth-User", username);
-	    	
-	    	return ResponseEntity.status(200).body(new ValidateResponseDTO(username, "Token validated"));
-	    }
+	public ResponseEntity<Void> validate(@AuthenticationPrincipal Jwt jwt) {
+	    String username = jwt.getClaimAsString("preferred_username");
+	    String email    = jwt.getClaimAsString("email");
+	    String sub      = jwt.getSubject();
 	    
-	    return ResponseEntity.status(400).body(new ValidateResponseDTO("", "Invalid token"));
+	    Map<String, Object> todas = jwt.getClaims();
+
+	    return ResponseEntity.ok()
+	        .header("X-Auth-User", email)
+	        .build();
 	}
 }
