@@ -38,6 +38,7 @@ public class SecurityConfig {
 	        .requestMatchers("/protected").hasAuthority("USER")
 	        .anyRequest().authenticated())
 	    	.oauth2Login(Customizer.withDefaults())
+	    	.oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))
 	    	.logout(logout -> logout.logoutSuccessUrl("/"));
 
 		return http.build();
