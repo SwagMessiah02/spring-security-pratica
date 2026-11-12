@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,11 +33,14 @@ public class SecurityConfig {
 		http
 	    .csrf(c -> c.disable())
 	    .sessionManagement(session ->
-	        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 	    .authorizeHttpRequests(request -> request
-	        .requestMatchers("/login", "/register", "/validate").permitAll()
+	        .requestMatchers("/login", "/register", "/validate", "/callback").permitAll()
+	        .requestMatchers("/", "/public/**").permitAll()
 	        .requestMatchers("/protected").hasAuthority("USER")
-	        .anyRequest().authenticated());
+	        .anyRequest().authenticated())
+	    	.oauth2Login(Customizer.withDefaults())
+	    	.logout(logout -> logout.logoutSuccessUrl("/"));
 
 		return http.build();
 	}
