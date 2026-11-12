@@ -1,11 +1,7 @@
 package com.security.pratice.controllers;
 
-import java.util.Set;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.spi.LoggerContextFactory;
+import java.util.Set; 
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.logging.LoggingSystemFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
