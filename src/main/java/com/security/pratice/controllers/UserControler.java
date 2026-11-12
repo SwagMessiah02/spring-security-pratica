@@ -1,12 +1,20 @@
 package com.security.pratice.controllers;
 
 import java.util.Set;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.logging.LoggingSystemFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +34,7 @@ public class UserControler {
 	private UserRepository repository;
 	private PasswordEncoder passwordEncoder;
 	private JwtTokenService tokenService;
+	private org.slf4j.Logger log = LoggerFactory.getLogger(UserControler.class);
 	
 	public UserControler(AuthenticationManager authenticationManager, 
 			JwtTokenService jwtTokenService,
@@ -37,6 +46,21 @@ public class UserControler {
 		this.repository = repository;
 		this.passwordEncoder = passwordEncoder;
 		this.tokenService = tokenService;
+	}
+	
+	@GetMapping("/")
+	public ResponseEntity<LoginResponseDTO> 
+		token_reciever(@RegisteredOAuth2AuthorizedClient("keycloak") OAuth2AuthorizedClient client, HttpServletResponse response) {
+		
+		OAuth2AccessToken token = client.getAccessToken();
+		
+		String jwt = token.getTokenValue().toString();
+		
+		log.info("Token: {}", jwt);
+		
+		response.setHeader("Authorization", "Bearer " + jwt);
+		
+		return ResponseEntity.ok(new LoginResponseDTO(jwt, "Token"));
 	}
 	
 	@PostMapping("/login")
