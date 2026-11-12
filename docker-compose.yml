@@ -4,7 +4,7 @@ x-app: &app
     DB_HOST: db
     DB_USER: postgres
     DB_PASSWORD: 12345
-    KEYCLOAK_CLIENT_SECRET: client_secret
+    KEYCLOAK_CLIENT_SECRET: client-secret
     KEYCLOAK_INTERNAL_URL: http://keycloack:8080
     KEYCLOAK_BROWSER_URL: http://localhost:8084
   depends_on:
