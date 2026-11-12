@@ -4,6 +4,9 @@ x-app: &app
     DB_HOST: db
     DB_USER: postgres
     DB_PASSWORD: 12345
+    KEYCLOAK_CLIENT_SECRET: client_secret
+    KEYCLOAK_INTERNAL_URL: http://keycloack:8080
+    KEYCLOAK_BROWSER_URL: http://localhost:8084
   depends_on:
     db:
       condition: service_healthy
@@ -66,3 +69,43 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro      
+  auth_db:	
+    image: postgres
+    hostname: auth_db
+    container_name: keycloack_auth_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: keycloak_db
+    volumes:
+      - keycloak_pgdata:/var/lib/postgresql
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+  keycloack:
+    build: ./keycloack/build/.
+    command: start --optimized
+    environment:
+      KC_HOSTNAME: http://localhost:8084
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: 12345
+      KC_DB_URL: jdbc:postgresql://auth_db:5432/keycloak_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: 12345
+    ports:
+      - "8084:8080"
+      - "8443:8443"
+      - "9000:9000"
+    depends_on:
+      auth_db:
+        condition: service_healthy
+volumes:	
+  keycloak_pgdata:
