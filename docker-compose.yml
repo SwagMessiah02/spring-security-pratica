@@ -89,7 +89,7 @@ services:
       retries: 20
       start_period: 10s
   keycloack:
-    build: ./keycloack/build/.
+    build: ./keycloak/build/.
     command: start --optimized
     environment:
       KC_HOSTNAME: http://localhost:8084
