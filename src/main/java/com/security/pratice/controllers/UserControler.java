@@ -101,6 +101,10 @@ public class UserControler {
 	    String sub      = jwt.getSubject();
 	    
 	    Map<String, Object> todas = jwt.getClaims();
+	    
+	    if(jwt.getExpiresAt().compareTo(Instant.now()) < 0) {
+	    	return ResponseEntity.status(403).build();
+	    }
 
 	    return ResponseEntity.ok()
 	        .header("X-Auth-User", email)
