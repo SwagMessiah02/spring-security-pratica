@@ -1,5 +1,6 @@
 package com.security.pratice.controllers;
 
+import java.lang.ProcessHandle.Info;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set; 
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,18 +49,7 @@ public class UserControler {
 		this.passwordEncoder = passwordEncoder;
 		this.tokenService = tokenService;
 	}
-	
-	@GetMapping("/")
-	public ResponseEntity<LoginResponseDTO> 
-		token_reciever(@RegisteredOAuth2AuthorizedClient("keycloak") OAuth2AuthorizedClient client, HttpServletResponse response) {
 		
-		String token = client.getAccessToken().getTokenValue();
-		
-		response.setHeader("Authorization", "Bearer " + token);
-		
-		return ResponseEntity.ok(new LoginResponseDTO(token, "Token"));
-	}
-	
 	@PostMapping("/login")
 	public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest, HttpServletResponse response) {
 		
@@ -95,16 +86,8 @@ public class UserControler {
 	}
 	
 	@GetMapping("/validate")
-	public ResponseEntity<Void> validate(@AuthenticationPrincipal Jwt jwt) {
-	    String username = jwt.getClaimAsString("preferred_username");
-	    String email    = jwt.getClaimAsString("email");
-	    String sub      = jwt.getSubject();
-	    
-	    Map<String, Object> todas = jwt.getClaims();
-	    
-	    if(jwt.getExpiresAt().compareTo(Instant.now()) < 0) {
-	    	return ResponseEntity.status(403).build();
-	    }
+	public ResponseEntity<Void> validate(@AuthenticationPrincipal OidcUser user) {
+		String email = user.getClaimAsString("email");
 
 	    return ResponseEntity.ok()
 	        .header("X-Auth-User", email)
